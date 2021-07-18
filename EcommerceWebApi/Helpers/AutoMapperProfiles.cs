@@ -44,6 +44,18 @@ namespace EcommerceWebApi.Helpers
             // 訂單主檔
             CreateMap<OrderCreationDto, OrderMaster>();
             CreateMap<OrderMaster, OrderDto>();
+            // 進貨主檔
+            CreateMap<PurchaseCreationDto, PurchaseMaster>();
+            CreateMap<PurchaseMaster, PurchaseDto>()
+                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.PurchaseDetails.Sum(x => x.Amount)))
+                .ForMember(dest => dest.TotalCheckAmount, opt => opt.MapFrom(src => src.PurchaseDetails.Sum(x => x.CheckAmount)));
+            // 進貨明細
+            CreateMap<PurchaseDetailCreationDto, PurchaseDetail>();
+            CreateMap<PurchaseDetail, PurchaseDetailDto>()
+                .ForMember(dest => dest.ProudctName, opt => opt.MapFrom(src => src.ProductDetail.Product.Name))
+                .ForMember(dest => dest.Color, opt => opt.MapFrom(src => src.ProductDetail.Color))
+                .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.ProductDetail.Size));
+            CreateMap<AcceptancePurchaseDetailDto, PurchaseDetail>();
 
         }
     }

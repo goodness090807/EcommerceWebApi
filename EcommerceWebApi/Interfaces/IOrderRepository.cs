@@ -19,11 +19,18 @@ namespace EcommerceWebApi.Interfaces
         /// <returns></returns>
         Task<PagedList<OrderDto>> GetOrders(OrderParams orderParams);
         /// <summary>
-        /// 透過訂單編號取得訂單
+        /// 取得使用者訂單
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <param name="orderParams"></param>
+        /// <returns></returns>
+        Task<PagedList<OrderDto>> GetUserOrders(string UserId, OrderParams orderParams);
+        /// <summary>
+        /// 透過訂單流水號取得訂單數量
         /// </summary>
         /// <param name="orderSerialNumber"></param>
         /// <returns></returns>
-        Task<int> GetOrderBySerialNoLike(string orderSerialNumber);
+        Task<int> GetOrderCountBySerialNumberLike(string orderSerialNumber);
         /// <summary>
         /// 新增訂單
         /// </summary>

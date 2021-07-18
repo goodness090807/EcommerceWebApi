@@ -45,6 +45,10 @@ namespace EcommerceWebApi.Entities
         /// 商品庫存物件
         /// </summary>
         public ProductStock ProductStock { get; set; }
+        /// <summary>
+        /// 進貨明細物件
+        /// </summary>
+        public PurchaseDetail PurchaseDetail { get; set; }
 
         public ICollection<UserShoppingCart> UserShoppingCarts { get; set; }
     }

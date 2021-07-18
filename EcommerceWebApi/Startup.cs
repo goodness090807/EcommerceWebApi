@@ -50,6 +50,7 @@ namespace EcommerceWebApi
             services.AddScoped<IProductStockRepository, ProductStockRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
+            services.AddScoped<IPurchaseRepository, PurchaseRepository>();
             services.AddScoped<IFileStorageService, FileStorageService>();
             services.AddAutoMapper(typeof(Startup).Assembly);
             services.AddControllers();

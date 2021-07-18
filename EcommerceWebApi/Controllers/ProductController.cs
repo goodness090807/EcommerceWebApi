@@ -105,7 +105,7 @@ namespace EcommerceWebApi.Controllers
         }
 
         /// <summary>
-        /// 透過商品Id取得所有商品規格的變號
+        /// 透過商品Id取得所有商品規格的資訊
         /// </summary>
         /// <param name="ProductId">商品Id</param>
         /// <returns></returns>

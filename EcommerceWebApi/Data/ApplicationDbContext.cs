@@ -21,6 +21,8 @@ namespace EcommerceWebApi.Data
         public DbSet<OrderMaster> OrderMasters { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<TempStock> TempStocks { get; set; }
+        public DbSet<PurchaseMaster> PurchaseMasters { get; set; }
+        public DbSet<PurchaseDetail> PurchaseDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -87,7 +89,12 @@ namespace EcommerceWebApi.Data
             builder.Entity<OrderMaster>()
                 .Property(x => x.SubTotal)
                 .HasColumnType("decimal(18,5)");
+
+            builder.Entity<OrderMaster>()
+                .Property(x => x.OrderStatus)
+                .HasConversion<string>();
             #endregion
+
             #region 訂單明細
             builder.Entity<Product>()
                 .HasMany(x => x.OrderDetails)
@@ -96,6 +103,22 @@ namespace EcommerceWebApi.Data
             builder.Entity<OrderDetail>()
                 .Property(x => x.Price)
                 .HasColumnType("decimal(18,5)");
+            #endregion
+
+            #region 進貨主檔
+            builder.Entity<PurchaseMaster>()
+                .HasMany(x => x.PurchaseDetails)
+                .WithOne(x => x.PurchaseMaster)
+                .HasForeignKey(f => f.PurchaseMasterId);
+
+            builder.Entity<ProductDetail>()
+                .HasOne(x => x.PurchaseDetail)
+                .WithOne(x => x.ProductDetail)
+                .HasForeignKey<PurchaseDetail>(f => f.ProductDetailId);
+            // 將Emun透過字串帶入
+            builder.Entity<PurchaseMaster>()
+                .Property(x => x.PurchaseStatus)
+                .HasConversion<string>();
             #endregion
         }
     }

@@ -31,7 +31,16 @@ namespace EcommerceWebApi.Repositories
                    orderParams.PageNumber, orderParams.PageSize);
         }
 
-        public async Task<int> GetOrderBySerialNoLike(string orderSerialNumber)
+        public async Task<PagedList<OrderDto>> GetUserOrders(string UserId, OrderParams orderParams)
+        {
+            var query = _context.OrderMasters.AsQueryable();
+            query = query.Where(x => x.AppUserId == UserId);
+
+            return await PagedList<OrderDto>.CreateAsync(query.ProjectTo<OrderDto>(_mapper.ConfigurationProvider).AsNoTracking(),
+                   orderParams.PageNumber, orderParams.PageSize);
+        }
+
+        public async Task<int> GetOrderCountBySerialNumberLike(string orderSerialNumber)
         {
             return await _context.OrderMasters.Where(x => EF.Functions.Like(x.OrderSerialNumber, $"{orderSerialNumber}%")).CountAsync();
         }

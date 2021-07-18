@@ -23,9 +23,9 @@ namespace EcommerceWebApi.Repositories
             return await _context.ProductStocks.FirstOrDefaultAsync(x => x.ProductDetailId == ProductDetailId);
         }
 
-        public void UpdateProductStock(ProductStock productDetail)
+        public void UpdateProductStock(ProductStock productStock)
         {
-            _context.Entry(productDetail).State = EntityState.Modified;
+            _context.Entry(productStock).State = EntityState.Modified;
         }
 
         public async Task<bool> SaveAllAsync()

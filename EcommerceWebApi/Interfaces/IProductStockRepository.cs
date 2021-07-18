@@ -20,8 +20,8 @@ namespace EcommerceWebApi.Interfaces
         /// <summary>
         /// 更新庫存量
         /// </summary>
-        /// <param name="productDetail"></param>
-        void UpdateProductStock(ProductStock productDetail);
+        /// <param name="productStock"></param>
+        void UpdateProductStock(ProductStock productStock);
         /// <summary>
         /// 儲存資訊
         /// </summary>

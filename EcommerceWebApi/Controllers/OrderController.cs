@@ -27,7 +27,7 @@ namespace EcommerceWebApi.Controllers
         private readonly IMapper _mapper;
 
         /// <summary>
-        /// 
+        /// 建構子
         /// </summary>
         /// <param name="orderRepository"></param>
         /// <param name="productRepository"></param>
@@ -54,6 +54,20 @@ namespace EcommerceWebApi.Controllers
         }
 
         /// <summary>
+        /// 取得使用者所擁有的訂單
+        /// </summary>
+        /// <param name="orderParams"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("GetUserOrders")]
+        public async Task<ActionResult<PagedList<OrderDto>>> GetUserOrders(OrderParams orderParams)
+        {
+            var userId = User.GetUserId();
+
+            return await _orderRepository.GetUserOrders(userId, orderParams);
+        }
+
+        /// <summary>
         /// 新增訂單
         /// </summary>
         /// <param name="orderCreationDto"></param>
@@ -69,9 +83,9 @@ namespace EcommerceWebApi.Controllers
             orderMaster.AppUser = user;
             #region 設定訂單流水號
             var orderSerialNumber = DateTime.Now.ToString("yyyyMMddhhmmss");
-
-            var SameSerialNoCount = await _orderRepository.GetOrderBySerialNoLike(orderSerialNumber);
-
+            // 同樣訂單編號要額外計算取得流水號碼
+            var SameSerialNoCount = await _orderRepository.GetOrderCountBySerialNumberLike(orderSerialNumber);
+            // 加上流水號碼
             orderMaster.OrderSerialNumber = orderSerialNumber + SameSerialNoCount;
             #endregion
 
@@ -120,5 +134,17 @@ namespace EcommerceWebApi.Controllers
 
             return BadRequest("新增訂單發生錯誤");
         }
+
+        ///// <summary>
+        ///// 透過訂單Id做訂單出貨
+        ///// </summary>
+        ///// <param name="OrderIds"></param>
+        ///// <returns></returns>
+        //[Authorize(Roles = "Admin")]
+        //[HttpPost]
+        //public async Task<ActionResult> ShipOrderByOrderId(List<int> OrderIds)
+        //{
+
+        //}
     }
 }

@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EcommerceWebApi.Entities
+namespace EcommerceWebApi.Dtos
 {
     /// <summary>
-    /// 進貨主檔
+    /// 進貨單資訊
     /// </summary>
-    public class PurchaseMaster
+    public class PurchaseDto
     {
         /// <summary>
         /// Id
@@ -20,25 +20,29 @@ namespace EcommerceWebApi.Entities
         /// </summary>
         public string PurchaseNum { get; set; }
         /// <summary>
+        /// 總進貨量
+        /// </summary>
+        public int TotalAmount { get; set; }
+        /// <summary>
+        /// 總清點量
+        /// </summary>
+        public int TotalCheckAmount { get; set; }
+        /// <summary>
         /// 備註
         /// </summary>
         public string Note { get; set; }
         /// <summary>
         /// 進貨狀態
         /// </summary>
-        public PurchaseStatus PurchaseStatus { get; set; } = PurchaseStatus.UnAcceptance;
+        public string PurchaseStatus { get; set; }
         /// <summary>
         /// 進貨單創建日期
         /// </summary>
-        public DateTime CreateDate { get; set; } = DateTime.Now;
-        /// <summary>
-        /// 進貨單變更日期
-        /// </summary>
-        public DateTime UpdateDate { get; set; } = DateTime.Now;
+        public DateTime CreateDate { get; set; }
 
         /// <summary>
         /// 進貨單明細
         /// </summary>
-        public ICollection<PurchaseDetail> PurchaseDetails { get; set; }
+        public List<PurchaseDetailDto> PurchaseDetails { get; set; }
     }
 }

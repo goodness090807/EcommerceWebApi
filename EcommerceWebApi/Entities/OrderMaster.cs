@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EcommerceWebApi.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -53,7 +54,11 @@ namespace EcommerceWebApi.Entities
         /// <summary>
         /// 訂單狀態
         /// </summary>
-        public string OrderStatus { get; set; } = "unShip";
+        public OrderStatus OrderStatus { get; set; } = OrderStatus.UnConfirm;
+        /// <summary>
+        /// 訂單狀態變更日期
+        /// </summary>
+        public DateTime UpdateDate { get; set; } = DateTime.Now;
 
 
         /// <summary>
