@@ -6,18 +6,10 @@ using System.Threading.Tasks;
 namespace EcommerceWebApi.Dtos
 {
     /// <summary>
-    /// 訂單下單格式
+    /// 更新訂單資訊
     /// </summary>
-    public class OrderCreationDto
+    public class OrderUpdateDto
     {
-        /// <summary>
-        /// 下訂的商品規格Id
-        /// </summary>
-        public List<OrderDetailCreactionDto> productDetails { get; set; }
-        ///// <summary>
-        ///// 訂單折扣
-        ///// </summary>
-        //public int Discount { get; set; }
         /// <summary>
         /// 收件人姓名
         /// </summary>

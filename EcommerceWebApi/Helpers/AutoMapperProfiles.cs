@@ -44,6 +44,7 @@ namespace EcommerceWebApi.Helpers
             // 訂單主檔
             CreateMap<OrderCreationDto, OrderMaster>();
             CreateMap<OrderMaster, OrderDto>();
+            CreateMap<OrderUpdateDto, OrderMaster>();
             // 進貨主檔
             CreateMap<PurchaseCreationDto, PurchaseMaster>();
             CreateMap<PurchaseMaster, PurchaseDto>()

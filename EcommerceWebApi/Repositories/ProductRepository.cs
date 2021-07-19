@@ -116,9 +116,11 @@ namespace EcommerceWebApi.Repositories
                 .SingleOrDefaultAsync(x => x.Id == Id);
         }
 
-        public async Task<ProductDetail> GetProductDetailByColorAndSize(string Color, string Size)
+        public async Task<ProductDetail> GetProductDetailByColorAndSize(int ProductId, string Color, string Size)
         {
-            return await _context.ProductDetails.Include(x => x.ProductStock).SingleOrDefaultAsync(x => x.Color == Color && x.Size == Size);
+            return await _context.ProductDetails.Include(x => x.ProductStock)
+                .Where(x => x.ProductId == ProductId && x.Color == Color && x.Size == Size)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<bool> SaveAllAsync()

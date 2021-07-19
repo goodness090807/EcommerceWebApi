@@ -26,6 +26,19 @@ namespace EcommerceWebApi.Interfaces
         /// <returns></returns>
         Task<PagedList<OrderDto>> GetUserOrders(string UserId, OrderParams orderParams);
         /// <summary>
+        /// 透過OrderId取得OrderMaster
+        /// </summary>
+        /// <param name="OrderId"></param>
+        /// <returns></returns>
+        Task<OrderMaster> GetOrderMasterById(int OrderId);
+        /// <summary>
+        /// 透過UserId和OrderId取得訂單
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <param name="OrderId"></param>
+        /// <returns></returns>
+        Task<OrderMaster> GetOrderMasterByUserIdAndOrderId(string UserId, int OrderId);
+        /// <summary>
         /// 透過訂單流水號取得訂單數量
         /// </summary>
         /// <param name="orderSerialNumber"></param>
@@ -40,7 +53,12 @@ namespace EcommerceWebApi.Interfaces
         /// 新增至暫存庫存
         /// </summary>
         /// <param name="tempStocks">暫存庫存資料</param>
-        void AddTempStock(List<TempStock> tempStocks);
+        void AddTempStocks(List<TempStock> tempStocks);
+        /// <summary>
+        /// 更新訂單
+        /// </summary>
+        /// <param name="orderMaster"></param>
+        void UpdateOrder(OrderMaster orderMaster);
         /// <summary>
         /// 儲存資訊
         /// </summary>

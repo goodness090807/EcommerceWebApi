@@ -11,7 +11,7 @@ namespace EcommerceWebApi.Enums
     public enum OrderStatus
     {
         /// <summary>
-        /// 待確認接收訂單
+        /// 待確認
         /// </summary>
         UnConfirm,
         /// <summary>
@@ -21,6 +21,10 @@ namespace EcommerceWebApi.Enums
         /// <summary>
         /// 已出貨
         /// </summary>
-        Shipped
+        Shipped,
+        /// <summary>
+        /// 取消單
+        /// </summary>
+        Cancel
     }
 }

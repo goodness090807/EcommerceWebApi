@@ -104,7 +104,7 @@ namespace EcommerceWebApi.Controllers
         public async Task<ActionResult<UserShoppingCartDto>> AddToShoppingCartBySpecification(AddToShoppingCartBySpecificationDto dto)
         {
             var userId = User.GetUserId();
-            var productDetail = await _productRepository.GetProductDetailByColorAndSize(dto.Color, dto.Size);
+            var productDetail = await _productRepository.GetProductDetailByColorAndSize(dto.ProductId, dto.Color, dto.Size);
 
             var userShoppingCart = await _shoppingCartRepository.GetUserShoppingById(userId, productDetail.Id);
 

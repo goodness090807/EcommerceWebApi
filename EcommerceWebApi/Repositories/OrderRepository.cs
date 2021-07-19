@@ -40,6 +40,16 @@ namespace EcommerceWebApi.Repositories
                    orderParams.PageNumber, orderParams.PageSize);
         }
 
+        public async Task<OrderMaster> GetOrderMasterById(int OrderId)
+        {
+            return await _context.OrderMasters.Include(x => x.OrderDetails).Where(x => x.Id == OrderId).FirstOrDefaultAsync();
+        }
+
+        public async Task<OrderMaster> GetOrderMasterByUserIdAndOrderId(string UserId, int OrderId)
+        {
+            return await _context.OrderMasters.Include(x => x.OrderDetails).Where(x => x.AppUserId == UserId && x.Id == OrderId).FirstOrDefaultAsync();
+        }
+
         public async Task<int> GetOrderCountBySerialNumberLike(string orderSerialNumber)
         {
             return await _context.OrderMasters.Where(x => EF.Functions.Like(x.OrderSerialNumber, $"{orderSerialNumber}%")).CountAsync();
@@ -50,10 +60,16 @@ namespace EcommerceWebApi.Repositories
             _context.OrderMasters.Add(orderMaster);
         }
 
-        public void AddTempStock(List<TempStock> tempStocks)
+        public void AddTempStocks(List<TempStock> tempStocks)
         {
             _context.TempStocks.AddRange(tempStocks);
         }
+
+        public void UpdateOrder(OrderMaster orderMaster)
+        {
+            _context.Entry(orderMaster).State = EntityState.Modified;
+        }
+
         public async Task<bool> SaveAllAsync()
         {
             return await _context.SaveChangesAsync() > 0;

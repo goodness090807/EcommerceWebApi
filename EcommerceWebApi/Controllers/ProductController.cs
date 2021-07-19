@@ -190,7 +190,7 @@ namespace EcommerceWebApi.Controllers
         [HttpPost("AddProductDetail/{ProductId}")]
         public async Task<ActionResult> AddProductDetail(int ProductId, ProductDetailCreationDto productDetailCreationDto)
         {
-            if (await CheckSpeExist(productDetailCreationDto.Color, productDetailCreationDto.Size))
+            if (await CheckSpeExist(ProductId, productDetailCreationDto.Color, productDetailCreationDto.Size))
                 return BadRequest("已有相同的規格，無法新增!!!");
 
             var product = await _productRepository.GetProductByIdAsync(ProductId);
@@ -290,9 +290,9 @@ namespace EcommerceWebApi.Controllers
             return false;
         }
 
-        private async Task<bool> CheckSpeExist(string Color, string Size)
+        private async Task<bool> CheckSpeExist(int ProductId, string Color, string Size)
         {
-            var productDetail = await _productRepository.GetProductDetailByColorAndSize(Color, Size);
+            var productDetail = await _productRepository.GetProductDetailByColorAndSize(ProductId, Color, Size);
 
             if (productDetail != null)
                 return true;

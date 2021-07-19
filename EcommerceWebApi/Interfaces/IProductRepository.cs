@@ -81,12 +81,13 @@ namespace EcommerceWebApi.Interfaces
         /// <returns></returns>
         Task<ProductDetail> GetProductDetailByIdAsync(int Id);
         /// <summary>
-        /// 透過顏色和尺寸取得商品規格資料
+        /// 透過顏色和尺寸取得該商品規格資料
         /// </summary>
+        /// <param name="ProductId"></param>
         /// <param name="Color"></param>
         /// <param name="Size"></param>
         /// <returns></returns>
-        Task<ProductDetail> GetProductDetailByColorAndSize(string Color, string Size);
+        Task<ProductDetail> GetProductDetailByColorAndSize(int ProductId, string Color, string Size);
         /// <summary>
         /// 更新商品規格資料
         /// </summary>

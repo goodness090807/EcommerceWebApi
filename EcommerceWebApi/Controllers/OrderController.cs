@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EcommerceWebApi.Dtos;
 using EcommerceWebApi.Entities;
+using EcommerceWebApi.Enums;
 using EcommerceWebApi.Extensions;
 using EcommerceWebApi.Helpers;
 using EcommerceWebApi.Interfaces;
@@ -48,7 +49,7 @@ namespace EcommerceWebApi.Controllers
         /// <returns></returns>
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public async Task<ActionResult<PagedList<OrderDto>>> GetOrders(OrderParams orderParams)
+        public async Task<ActionResult<PagedList<OrderDto>>> GetOrders([FromQuery] OrderParams orderParams)
         {
             return await _orderRepository.GetOrders(orderParams);
         }
@@ -60,7 +61,7 @@ namespace EcommerceWebApi.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetUserOrders")]
-        public async Task<ActionResult<PagedList<OrderDto>>> GetUserOrders(OrderParams orderParams)
+        public async Task<ActionResult<PagedList<OrderDto>>> GetUserOrders([FromQuery] OrderParams orderParams)
         {
             var userId = User.GetUserId();
 
@@ -96,7 +97,7 @@ namespace EcommerceWebApi.Controllers
             {
                 var productDetail = await _productRepository.GetProductDetailByIdAsync(productCreationDetail.ProductDetailId);
 
-                if(productDetail.ProductStock.StockAmount - productDetail.ProductStock.OrderAmount
+                if (productDetail.ProductStock.StockAmount - productDetail.ProductStock.OrderAmount
                     - productCreationDetail.Quantity < 0)
                 {
                     return BadRequest($"{productDetail.Product.Name}/{productDetail.Color}/{productDetail.Size} 商品庫存不足");
@@ -112,8 +113,8 @@ namespace EcommerceWebApi.Controllers
                     Product = productDetail.Product
                 };
                 // 新增至暫存庫存
-                tempStocks.Add(new TempStock 
-                { 
+                tempStocks.Add(new TempStock
+                {
                     ProductDetailId = productCreationDetail.ProductDetailId,
                     OrderQuantity = productCreationDetail.Quantity
                 });
@@ -128,23 +129,133 @@ namespace EcommerceWebApi.Controllers
             #endregion
 
             _orderRepository.AddOrder(orderMaster);
-            _orderRepository.AddTempStock(tempStocks);
+            _orderRepository.AddTempStocks(tempStocks);
 
             if (await _orderRepository.SaveAllAsync()) return Ok();
 
             return BadRequest("新增訂單發生錯誤");
         }
 
-        ///// <summary>
-        ///// 透過訂單Id做訂單出貨
-        ///// </summary>
-        ///// <param name="OrderIds"></param>
-        ///// <returns></returns>
-        //[Authorize(Roles = "Admin")]
-        //[HttpPost]
-        //public async Task<ActionResult> ShipOrderByOrderId(List<int> OrderIds)
-        //{
+        /// <summary>
+        /// 更新訂單(只有待確認的訂單能變更)
+        /// </summary>
+        /// <param name="OrderId">訂單Id</param>
+        /// <param name="orderUpdateDto"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPut("{OrderId}")]
+        public async Task<ActionResult> UpdateOrder(int OrderId, OrderUpdateDto orderUpdateDto)
+        {
+            var UserId = User.GetUserId();
 
-        //}
+            var order = await _orderRepository.GetOrderMasterByUserIdAndOrderId(UserId, OrderId);
+
+            if (order == null) return BadRequest("查無該訂單");
+            if (order.OrderStatus != OrderStatus.UnConfirm) return BadRequest("確認後的訂單無法修改");
+
+            _mapper.Map(orderUpdateDto, order);
+            _orderRepository.UpdateOrder(order);
+
+            if (await _orderRepository.SaveAllAsync()) return NoContent();
+
+            return BadRequest("變更訂單資訊發生錯誤");
+        }
+
+        /// <summary>
+        /// 取消訂單
+        /// </summary>
+        /// <param name="OrderId">訂單Id</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPut("CancelOrder/{OrderId}")]
+        public async Task<ActionResult> CancelOrder(int OrderId)
+        {
+            var UserId = User.GetUserId();
+
+            var order = await _orderRepository.GetOrderMasterByUserIdAndOrderId(UserId, OrderId);
+            if (order == null) return BadRequest("查無該訂單");
+            if (order.OrderStatus != OrderStatus.UnConfirm) return BadRequest("已被確認的訂單無法取消");
+
+
+            List<TempStock> tempStocks = new List<TempStock>();
+            foreach(var orderDetail in order.OrderDetails)
+            {
+                var productDetail = await _productRepository.GetProductDetailByColorAndSize(orderDetail.ProductId, orderDetail.Color, orderDetail.Size);
+                // 新增至暫存庫存
+                tempStocks.Add(new TempStock
+                {
+                    ProductDetailId = productDetail.Id,
+                    OrderQuantity = -orderDetail.Quantity
+                });
+            }
+
+            order.OrderStatus = OrderStatus.Cancel;
+            _orderRepository.UpdateOrder(order);
+            _orderRepository.AddTempStocks(tempStocks);
+
+            if (await _orderRepository.SaveAllAsync()) return NoContent();
+
+            return BadRequest("取消訂單資訊發生錯誤");
+        }
+
+        /// <summary>
+        /// 確認訂單(確認後不能修改訂單資訊)
+        /// </summary>
+        /// <param name="OrderId">訂單Id</param>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin")]
+        [HttpPut("ConfirmOrder/{OrderId}")]
+        public async Task<ActionResult> ConfirmOrder(int OrderId)
+        {
+            var order = await _orderRepository.GetOrderMasterById(OrderId);
+            // 確認訂單，變成待出貨
+            order.OrderStatus = OrderStatus.UnShip;
+            _orderRepository.UpdateOrder(order);
+
+            if (await _orderRepository.SaveAllAsync()) return NoContent();
+
+            return BadRequest("確認訂單發生錯誤");
+        }
+
+        /// <summary>
+        /// 透過訂單Id做訂單出貨
+        /// </summary>
+        /// <param name="OrderIds"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin")]
+        [HttpPost("ShipOrderByOrderIds")]
+        public async Task<ActionResult> ShipOrderByOrderId(List<int> OrderIds)
+        {
+            List<string> ErrorOrders = new List<string>();
+            foreach(var orderId in OrderIds)
+            {
+                var orderMaster = await _orderRepository.GetOrderMasterById(orderId);
+
+                if(orderMaster.OrderStatus != OrderStatus.UnShip)
+                {
+                    ErrorOrders.Add($"訂單編號：{orderMaster.OrderSerialNumber}，不為待出貨，不能做訂單出貨");
+                    continue;
+                }
+
+                foreach (var orderDetail in orderMaster.OrderDetails)
+                {
+                    var productDetail = await _productRepository.GetProductDetailByColorAndSize(orderDetail.ProductId, orderDetail.Color, orderDetail.Size);
+                    productDetail.ProductStock.StockAmount -= orderDetail.Quantity;
+                    productDetail.ProductStock.OrderAmount -= orderDetail.Quantity;
+                    // 更新商品資料
+                    _productRepository.UpdateProductDetail(productDetail);
+                }
+
+                orderMaster.OrderStatus = OrderStatus.Shipped;
+                orderMaster.UpdateDate = DateTime.Now;
+                _orderRepository.UpdateOrder(orderMaster);
+            }
+
+            if (ErrorOrders.Count > 0) return BadRequest(string.Join("\r\n", ErrorOrders));
+
+            if (await _orderRepository.SaveAllAsync()) return Ok("出貨成功");
+
+            return BadRequest("訂單出貨發生錯誤!!!");
+        }
     }
 }
