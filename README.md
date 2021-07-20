@@ -2,7 +2,7 @@
 
 ## 環境安裝
 
-1. 先到微軟官網(https://dotnet.microsoft.com/download)，下載 .Net 5.0的SDK
+1. 先到微軟官網(https://dotnet.microsoft.com/download )，下載 .Net 5.0的SDK
 
 ![下載.net5圖片](https://i.imgur.com/gYlBtqr.png)
 
